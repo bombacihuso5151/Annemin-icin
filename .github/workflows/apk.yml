@@ -12,19 +12,22 @@ jobs:
       - name: ZIP Dosyasini Ac
         run: |
           unzip -o *.zip
-          if [ -d "AnnemRehberi" ]; then cp -rf AnnemRehberi/* .; fi
+          DIR=$(find . -maxdepth 2 -name "settings.gradle*" -exec dirname {} \; | head -n 1)
+          if [ -n "$DIR" ] && [ "$DIR" != "." ]; then cp -rf "$DIR"/* .; fi
       - name: Java Kurulumu
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
-      - name: Gradle ile APK Derle
+      - name: Gradle Kurulumu
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.4'
-          arguments: assembleDebug
+      - name: APK Derle
+        run: gradle assembleDebug
       - name: APK Dosyasini Yukle
         uses: actions/upload-artifact@v4
         with:
           name: AnnemRehberi-APK
           path: app/build/outputs/apk/debug/*.apk
+
